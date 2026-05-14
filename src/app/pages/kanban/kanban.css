@@ -118,3 +118,27 @@
   color: #dc2626;
   font-weight: 600;
 }
+
+.ai-box {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.ai-box h3 {
+  margin-top: 0;
+  color: #1d4ed8;
+}
+
+.ai-box p {
+  margin: 6px 0;
+  color: #334155;
+}
+.task-card small {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #64748b;
+}

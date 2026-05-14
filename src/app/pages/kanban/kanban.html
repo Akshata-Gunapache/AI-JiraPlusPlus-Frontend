@@ -23,6 +23,21 @@
     </select>
 
     <button (click)="createTask()">Create Task</button>
+    @if (hasTaskInput()) {
+  <div class="ai-box">
+    <h3>AI Priority Suggestion</h3>
+
+    <p>
+      Suggested Priority:
+      <strong>{{ getAiSuggestion() }}</strong>
+    </p>
+
+    <p>
+      Reason:
+      {{ getAiReason() }}
+    </p>
+  </div>
+}
   </div>
 
   @if (loading) {
@@ -50,6 +65,7 @@
             <h3>{{ task.title }}</h3>
             <p>{{ task.description }}</p>
             <span>{{ task.priority }}</span>
+            <small>Created: {{ task.createdAt }}</small>
           </div>
         }
       </div>
@@ -71,6 +87,7 @@
             <h3>{{ task.title }}</h3>
             <p>{{ task.description }}</p>
             <span>{{ task.priority }}</span>
+            <small>Created: {{ task.createdAt }}</small>
           </div>
         }
       </div>
@@ -92,6 +109,7 @@
             <h3>{{ task.title }}</h3>
             <p>{{ task.description }}</p>
             <span>{{ task.priority }}</span>
+            <small>Created: {{ task.createdAt }}</small>
           </div>
         }
       </div>

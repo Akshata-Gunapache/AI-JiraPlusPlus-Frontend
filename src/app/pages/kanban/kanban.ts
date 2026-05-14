@@ -82,6 +82,7 @@ export class Kanban implements OnInit {
     }
   }
 
+
   async drop(event: CdkDragDrop<any[]>, newStatus: string) {
     if (event.previousContainer === event.container) {
       moveItemInArray(
@@ -116,4 +117,56 @@ export class Kanban implements OnInit {
     localStorage.removeItem('token');
     this.router.navigate(['/']);
   }
+
+  hasTaskInput() {
+  return this.title.trim().length > 0 || this.description.trim().length > 0;
+}
+
+getAiSuggestion() {
+  const text = (this.title + ' ' + this.description).toLowerCase();
+
+  if (!this.hasTaskInput()) {
+    return '';
+  }
+
+  if (
+    text.includes('security') ||
+    text.includes('jwt') ||
+    text.includes('authentication') ||
+    text.includes('production') ||
+    text.includes('urgent') ||
+    text.includes('critical')
+  ) {
+    return 'HIGH';
+  }
+
+  if (
+    text.includes('bug') ||
+    text.includes('fix') ||
+    text.includes('api') ||
+    text.includes('integration')
+  ) {
+    return 'MEDIUM';
+  }
+
+  return 'LOW';
+}
+
+getAiReason() {
+  const priority = this.getAiSuggestion();
+
+  if (!priority) {
+    return '';
+  }
+
+  if (priority === 'HIGH') {
+    return 'Critical security, production, or urgent workflow detected';
+  }
+
+  if (priority === 'MEDIUM') {
+    return 'Moderate engineering impact predicted from task context';
+  }
+
+  return 'Low urgency based on current task details';
+}
 }

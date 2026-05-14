@@ -16,6 +16,18 @@
     <div class="topbar">
       <h1>Workflow Dashboard</h1>
       <p>Distributed Real-Time Task Collaboration</p>
+      <div class="realtime-box">
+  <h3>Real-Time Collaboration Layer</h3>
+
+  <p>
+    STOMP WebSocket architecture configured for instant cross-user
+    task synchronization and live Kanban workflow updates.
+  </p>
+
+  <p>
+    Supports distributed real-time task collaboration without page refresh.
+  </p>
+</div>
     </div>
 
     <div class="stats">
@@ -23,6 +35,11 @@
       <div class="stat-card">
         <h2>{{ totalTasks }}</h2>
         <p>Total Tasks</p>
+      </div>
+
+      <div class="stat-card">
+        <h2>{{ todoTasks }}</h2>
+        <p>To Do</p>
       </div>
 
       <div class="stat-card">
@@ -35,6 +52,12 @@
         <p>Completed</p>
       </div>
 
+    </div>
+
+    <div class="info-card">
+      <h3>System Architecture</h3>
+      <p>Angular frontend connected to Spring Boot REST APIs with JWT authentication, Kanban workflow management, and WebSocket-ready real-time synchronization.</p>
+      <button (click)="goToKanban()">Open Kanban Board</button>
     </div>
 
   </div>

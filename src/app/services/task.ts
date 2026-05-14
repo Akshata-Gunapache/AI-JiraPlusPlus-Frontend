@@ -14,21 +14,22 @@ export class TaskService {
   }
 
   async createTask(task: any) {
-    const tasks = await this.getTasks();
+  const tasks = await this.getTasks();
 
-    const newTask = {
-      id: Date.now(),
-      title: task.title,
-      description: task.description,
-      priority: task.priority,
-      status: task.status || 'TODO'
-    };
+  const newTask = {
+    id: Date.now(),
+    title: task.title,
+    description: task.description,
+    priority: task.priority,
+    status: task.status || 'TODO',
+    createdAt: new Date().toLocaleString()
+  };
 
-    tasks.push(newTask);
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(tasks));
+  tasks.push(newTask);
+  localStorage.setItem(this.getStorageKey(), JSON.stringify(tasks));
 
-    return newTask;
-  }
+  return newTask;
+}
 
   async updateTaskStatus(id: number, status: string) {
     const tasks = await this.getTasks();

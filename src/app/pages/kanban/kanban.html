@@ -1,63 +1,88 @@
-<div class="board">
-
-  <div class="column">
-    <h2>To Do</h2>
-
-    <div
-      cdkDropList
-      #todoList="cdkDropList"
-      [cdkDropListData]="todo"
-      [cdkDropListConnectedTo]="[progressList, doneList]"
-      class="task-list"
-      (cdkDropListDropped)="drop($event)">
-
-      @for (task of todo; track task) {
-        <div class="task-card" cdkDrag>
-          {{ task }}
-        </div>
-      }
-
+<div class="kanban-page">
+  <div class="header">
+    <div>
+      <h1>AI Jira++ Kanban Board</h1>
+      <p>Real-time workflow management platform</p>
     </div>
+
+    <a href="/dashboard">Back to Dashboard</a>
   </div>
 
-  <div class="column">
-    <h2>In Progress</h2>
+  <div class="create-card">
+    <input [(ngModel)]="title" placeholder="Task title" />
+    <input [(ngModel)]="description" placeholder="Task description" />
 
-    <div
-      cdkDropList
-      #progressList="cdkDropList"
-      [cdkDropListData]="inProgress"
-      [cdkDropListConnectedTo]="[todoList, doneList]"
-      class="task-list"
-      (cdkDropListDropped)="drop($event)">
+    <select [(ngModel)]="priority">
+      <option value="HIGH">HIGH</option>
+      <option value="MEDIUM">MEDIUM</option>
+      <option value="LOW">LOW</option>
+    </select>
 
-      @for (task of inProgress; track task) {
-        <div class="task-card" cdkDrag>
-          {{ task }}
-        </div>
-      }
-
-    </div>
+    <button (click)="createTask()">Create Task</button>
   </div>
 
-  <div class="column">
-    <h2>Done</h2>
+  <div class="board">
+    <div class="column">
+      <h2>TODO</h2>
 
-    <div
-      cdkDropList
-      #doneList="cdkDropList"
-      [cdkDropListData]="done"
-      [cdkDropListConnectedTo]="[todoList, progressList]"
-      class="task-list"
-      (cdkDropListDropped)="drop($event)">
+      <div
+        cdkDropList
+        #todoList="cdkDropList"
+        [cdkDropListData]="todo"
+        [cdkDropListConnectedTo]="[progressList, doneList]"
+        class="task-list"
+        (cdkDropListDropped)="drop($event, 'TODO')">
 
-      @for (task of done; track task) {
-        <div class="task-card" cdkDrag>
-          {{ task }}
-        </div>
-      }
+        @for (task of todo; track task.id) {
+          <div class="task-card" cdkDrag>
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+            <span>{{ task.priority }}</span>
+          </div>
+        }
+      </div>
+    </div>
 
+    <div class="column">
+      <h2>IN PROGRESS</h2>
+
+      <div
+        cdkDropList
+        #progressList="cdkDropList"
+        [cdkDropListData]="inProgress"
+        [cdkDropListConnectedTo]="[todoList, doneList]"
+        class="task-list"
+        (cdkDropListDropped)="drop($event, 'IN_PROGRESS')">
+
+        @for (task of inProgress; track task.id) {
+          <div class="task-card" cdkDrag>
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+            <span>{{ task.priority }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="column">
+      <h2>DONE</h2>
+
+      <div
+        cdkDropList
+        #doneList="cdkDropList"
+        [cdkDropListData]="done"
+        [cdkDropListConnectedTo]="[todoList, progressList]"
+        class="task-list"
+        (cdkDropListDropped)="drop($event, 'DONE')">
+
+        @for (task of done; track task.id) {
+          <div class="task-card" cdkDrag>
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+            <span>{{ task.priority }}</span>
+          </div>
+        }
+      </div>
     </div>
   </div>
-
 </div>

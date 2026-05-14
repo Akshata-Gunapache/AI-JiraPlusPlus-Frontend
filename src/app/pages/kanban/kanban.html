@@ -5,7 +5,11 @@
       <p>Real-time workflow management platform</p>
     </div>
 
-    <a href="/dashboard">Back to Dashboard</a>
+    <div class="top-actions">
+      <a href="/dashboard">Back to Dashboard</a>
+      <button (click)="loadTasks()">Refresh</button>
+      <button (click)="logout()">Logout</button>
+    </div>
   </div>
 
   <div class="create-card">
@@ -20,6 +24,14 @@
 
     <button (click)="createTask()">Create Task</button>
   </div>
+
+  @if (loading) {
+    <p class="loading">Loading tasks...</p>
+  }
+
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
 
   <div class="board">
     <div class="column">

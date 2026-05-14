@@ -93,3 +93,28 @@
   font-weight: bold;
   color: #2563eb;
 }
+
+.top-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.top-actions button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #0f172a;
+  color: white;
+  cursor: pointer;
+}
+
+.loading {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.error {
+  color: #dc2626;
+  font-weight: 600;
+}

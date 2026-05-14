@@ -1,35 +1,44 @@
 import { Injectable } from '@angular/core';
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-  getHeaders() {
-    return {
-      Authorization: `Bearer ${localStorage.getItem('token')}`
-    };
+
+  private getStorageKey() {
+    const email = localStorage.getItem('userEmail') || 'guest';
+    return `tasks_${email}`;
   }
 
   async getTasks() {
-    const res = await axios.get(`${API_BASE_URL}/api/tasks`, {
-      headers: this.getHeaders()
-    });
-    return res.data;
+    const tasks = localStorage.getItem(this.getStorageKey());
+    return tasks ? JSON.parse(tasks) : [];
   }
 
   async createTask(task: any) {
-    const res = await axios.post(`${API_BASE_URL}/api/tasks`, task, {
-      headers: this.getHeaders()
-    });
-    return res.data;
+    const tasks = await this.getTasks();
+
+    const newTask = {
+      id: Date.now(),
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      status: task.status || 'TODO'
+    };
+
+    tasks.push(newTask);
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(tasks));
+
+    return newTask;
   }
 
   async updateTaskStatus(id: number, status: string) {
-    const res = await axios.put(
-      `${API_BASE_URL}/api/tasks/${id}/status?status=${status}`,
-      {},
-      { headers: this.getHeaders() }
+    const tasks = await this.getTasks();
+
+    const updatedTasks = tasks.map((task: any) =>
+      task.id === id ? { ...task, status } : task
     );
-    return res.data;
+
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(updatedTasks));
+
+    return updatedTasks.find((task: any) => task.id === id);
   }
 }

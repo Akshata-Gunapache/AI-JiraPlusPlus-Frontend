@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   CdkDragDrop,
   transferArrayItem,
@@ -22,40 +23,72 @@ export class Kanban implements OnInit {
   title = '';
   description = '';
   priority = 'HIGH';
-  projectId = 1;
 
-  constructor(private taskService: TaskService) {}
+  loading = false;
+  error = '';
+
+  constructor(
+    private taskService: TaskService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     await this.loadTasks();
   }
 
   async loadTasks() {
-    const tasks = await this.taskService.getTasks();
+    try {
+      this.loading = true;
+      this.error = '';
 
-    this.todo = tasks.filter((t: any) => t.status === 'TODO');
-    this.inProgress = tasks.filter((t: any) => t.status === 'IN_PROGRESS');
-    this.done = tasks.filter((t: any) => t.status === 'DONE');
+      const tasks = await this.taskService.getTasks();
+
+      console.log('TASKS FROM BACKEND:', tasks);
+
+      this.todo = tasks.filter((t: any) => !t.status || t.status === 'TODO');
+      this.inProgress = tasks.filter((t: any) => t.status === 'IN_PROGRESS');
+      this.done = tasks.filter((t: any) => t.status === 'DONE');
+
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
+      this.error = 'Failed to load tasks. Please login again.';
+    } finally {
+      this.loading = false;
+    }
   }
 
   async createTask() {
-    await this.taskService.createTask({
-      title: this.title,
-      description: this.description,
-      priority: this.priority,
-      status: 'TODO',
-      project: { id: this.projectId }
-    });
+    if (!this.title.trim()) return;
 
-    this.title = '';
-    this.description = '';
+    try {
+      this.error = '';
 
-    await this.loadTasks();
+      await this.taskService.createTask({
+        title: this.title,
+        description: this.description,
+        priority: this.priority,
+        status: 'TODO'
+      });
+
+      this.title = '';
+      this.description = '';
+      this.priority = 'HIGH';
+
+      await this.loadTasks();
+
+    } catch (error) {
+      console.error('Task creation failed:', error);
+      this.error = 'Task creation failed. Please check backend/token.';
+    }
   }
 
   async drop(event: CdkDragDrop<any[]>, newStatus: string) {
     if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
       return;
     }
 
@@ -68,7 +101,19 @@ export class Kanban implements OnInit {
       event.currentIndex
     );
 
-    await this.taskService.updateTaskStatus(task.id, newStatus);
-    await this.loadTasks();
+    task.status = newStatus;
+
+    try {
+      await this.taskService.updateTaskStatus(task.id, newStatus);
+    } catch (error) {
+      console.error('Status update failed:', error);
+      this.error = 'Status update failed. Reverting board.';
+      await this.loadTasks();
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/']);
   }
 }

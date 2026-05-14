@@ -8,14 +8,16 @@ import { API_BASE_URL } from '../config';
 export class AuthService {
 
   async login(email: string, password: string) {
-    const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
-      email,
-      password
-    });
+  const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
+    email,
+    password
+  });
 
-    localStorage.setItem('token', response.data.token);
-    return response.data;
-  }
+  localStorage.setItem('token', response.data.token);
+  localStorage.setItem('userEmail', email);
+
+  return response.data;
+}
 
   async register(name: string, email: string, password: string) {
     const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
@@ -34,9 +36,5 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
-  }
-
-  isLoggedIn() {
-    return !!this.getToken();
   }
 }

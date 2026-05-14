@@ -1,0 +1,15 @@
+<div class="auth-page">
+  <div class="card">
+    <h1>AI Jira++</h1>
+    <p>Distributed workflow management platform</p>
+
+    <input [(ngModel)]="email" placeholder="Email" />
+    <input [(ngModel)]="password" type="password" placeholder="Password" />
+
+    <button (click)="login()">Login</button>
+
+    <p class="error">{{ error }}</p>
+
+    <a href="/register">Create new account</a>
+  </div>
+</div>

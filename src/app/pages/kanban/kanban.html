@@ -1,5 +1,7 @@
 <div class="kanban-page">
+
   <div class="header">
+
     <div>
       <h1>AI Jira++ Kanban Board</h1>
       <p>Real-time workflow management platform</p>
@@ -10,11 +12,22 @@
       <button (click)="loadTasks()">Refresh</button>
       <button (click)="logout()">Logout</button>
     </div>
+
   </div>
 
   <div class="create-card">
-    <input [(ngModel)]="title" placeholder="Task title" />
-    <input [(ngModel)]="description" placeholder="Task description" />
+
+    <input
+      [(ngModel)]="title"
+      placeholder="Task title" />
+
+    <input
+      [(ngModel)]="description"
+      placeholder="Task description" />
+
+    <input
+      type="date"
+      [(ngModel)]="dueDate" />
 
     <select [(ngModel)]="priority">
       <option value="HIGH">HIGH</option>
@@ -22,22 +35,40 @@
       <option value="LOW">LOW</option>
     </select>
 
-    <button (click)="createTask()">Create Task</button>
+    <button (click)="createTask()">
+      Create Task
+    </button>
+
+    <select
+      [(ngModel)]="filterPriority"
+      (change)="loadTasks()">
+
+      <option value="ALL">ALL</option>
+      <option value="HIGH">HIGH</option>
+      <option value="MEDIUM">MEDIUM</option>
+      <option value="LOW">LOW</option>
+
+    </select>
+
     @if (hasTaskInput()) {
-  <div class="ai-box">
-    <h3>AI Priority Suggestion</h3>
 
-    <p>
-      Suggested Priority:
-      <strong>{{ getAiSuggestion() }}</strong>
-    </p>
+      <div class="ai-box">
 
-    <p>
-      Reason:
-      {{ getAiReason() }}
-    </p>
-  </div>
-}
+        <h3>AI Priority Suggestion</h3>
+
+        <p>
+          Suggested Priority:
+          <strong>{{ getAiSuggestion() }}</strong>
+        </p>
+
+        <p>
+          Reason:
+          {{ getAiReason() }}
+        </p>
+
+      </div>
+    }
+
   </div>
 
   @if (loading) {
@@ -49,7 +80,9 @@
   }
 
   <div class="board">
+
     <div class="column">
+
       <h2>TODO</h2>
 
       <div
@@ -61,17 +94,38 @@
         (cdkDropListDropped)="drop($event, 'TODO')">
 
         @for (task of todo; track task.id) {
+
           <div class="task-card" cdkDrag>
+
             <h3>{{ task.title }}</h3>
+
             <p>{{ task.description }}</p>
+
             <span>{{ task.priority }}</span>
-            <small>Created: {{ task.createdAt }}</small>
+
+            <small>
+              Created: {{ task.createdAt }}
+            </small>
+
+            <small>
+              Due: {{ task.dueDate }}
+            </small>
+
+            <button
+              class="delete-btn"
+              (click)="deleteTask(task.id)">
+              Delete
+            </button>
+
           </div>
         }
+
       </div>
+
     </div>
 
     <div class="column">
+
       <h2>IN PROGRESS</h2>
 
       <div
@@ -83,17 +137,38 @@
         (cdkDropListDropped)="drop($event, 'IN_PROGRESS')">
 
         @for (task of inProgress; track task.id) {
+
           <div class="task-card" cdkDrag>
+
             <h3>{{ task.title }}</h3>
+
             <p>{{ task.description }}</p>
+
             <span>{{ task.priority }}</span>
-            <small>Created: {{ task.createdAt }}</small>
+
+            <small>
+              Created: {{ task.createdAt }}
+            </small>
+
+            <small>
+              Due: {{ task.dueDate }}
+            </small>
+
+            <button
+              class="delete-btn"
+              (click)="deleteTask(task.id)">
+              Delete
+            </button>
+
           </div>
         }
+
       </div>
+
     </div>
 
     <div class="column">
+
       <h2>DONE</h2>
 
       <div
@@ -105,14 +180,36 @@
         (cdkDropListDropped)="drop($event, 'DONE')">
 
         @for (task of done; track task.id) {
+
           <div class="task-card" cdkDrag>
+
             <h3>{{ task.title }}</h3>
+
             <p>{{ task.description }}</p>
+
             <span>{{ task.priority }}</span>
-            <small>Created: {{ task.createdAt }}</small>
+
+            <small>
+              Created: {{ task.createdAt }}
+            </small>
+
+            <small>
+              Due: {{ task.dueDate }}
+            </small>
+
+            <button
+              class="delete-btn"
+              (click)="deleteTask(task.id)">
+              Delete
+            </button>
+
           </div>
         }
+
       </div>
+
     </div>
+
   </div>
+
 </div>

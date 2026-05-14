@@ -42,4 +42,18 @@ export class TaskService {
 
     return updatedTasks.find((task: any) => task.id === id);
   }
+
+  async deleteTask(id: number) {
+
+  const tasks = await this.getTasks();
+
+  const updatedTasks = tasks.filter(
+    (task: any) => task.id !== id
+  );
+
+  localStorage.setItem(
+    this.getStorageKey(),
+    JSON.stringify(updatedTasks)
+  );
+}
 }

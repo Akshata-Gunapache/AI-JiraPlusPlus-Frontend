@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import {
   CdkDragDrop,
   transferArrayItem,
   moveItemInArray,
   DragDropModule
 } from '@angular/cdk/drag-drop';
+
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TaskService } from '../../services/task';
 
 @Component({
@@ -16,6 +17,7 @@ import { TaskService } from '../../services/task';
   styleUrl: './kanban.css'
 })
 export class Kanban implements OnInit {
+
   todo: any[] = [];
   inProgress: any[] = [];
   done: any[] = [];
@@ -23,6 +25,9 @@ export class Kanban implements OnInit {
   title = '';
   description = '';
   priority = 'HIGH';
+  dueDate = '';
+
+  filterPriority = 'ALL';
 
   loading = false;
   error = '';
@@ -37,59 +42,91 @@ export class Kanban implements OnInit {
   }
 
   async loadTasks() {
+
+    this.loading = true;
+
     try {
-      this.loading = true;
-      this.error = '';
 
       const tasks = await this.taskService.getTasks();
 
-      console.log('TASKS FROM BACKEND:', tasks);
+      let filteredTasks = tasks;
 
-      this.todo = tasks.filter((t: any) => !t.status || t.status === 'TODO');
-      this.inProgress = tasks.filter((t: any) => t.status === 'IN_PROGRESS');
-      this.done = tasks.filter((t: any) => t.status === 'DONE');
+      if (this.filterPriority !== 'ALL') {
 
-    } catch (error) {
-      console.error('Failed to load tasks:', error);
-      this.error = 'Failed to load tasks. Please login again.';
+        filteredTasks = tasks.filter(
+          (t: any) => t.priority === this.filterPriority
+        );
+      }
+
+      this.todo = filteredTasks.filter(
+        (t: any) => !t.status || t.status === 'TODO'
+      );
+
+      this.inProgress = filteredTasks.filter(
+        (t: any) => t.status === 'IN_PROGRESS'
+      );
+
+      this.done = filteredTasks.filter(
+        (t: any) => t.status === 'DONE'
+      );
+
+      this.error = '';
+
+    } catch (err) {
+
+      console.error(err);
+      this.error = 'Failed to load tasks';
+
     } finally {
+
       this.loading = false;
     }
   }
 
   async createTask() {
+
     if (!this.title.trim()) return;
 
     try {
-      this.error = '';
 
       await this.taskService.createTask({
         title: this.title,
         description: this.description,
-        priority: this.priority,
-        status: 'TODO'
+        priority: this.getAiSuggestion(),
+        status: 'TODO',
+        dueDate: this.dueDate
       });
 
       this.title = '';
       this.description = '';
-      this.priority = 'HIGH';
+      this.dueDate = '';
 
       await this.loadTasks();
 
     } catch (error) {
-      console.error('Task creation failed:', error);
-      this.error = 'Task creation failed. Please check backend/token.';
+
+      console.error(error);
+      alert('Task creation failed');
     }
   }
 
+  async deleteTask(id: number) {
+
+    await this.taskService.deleteTask(id);
+
+    await this.loadTasks();
+  }
 
   async drop(event: CdkDragDrop<any[]>, newStatus: string) {
+
     if (event.previousContainer === event.container) {
+
       moveItemInArray(
         event.container.data,
         event.previousIndex,
         event.currentIndex
       );
+
       return;
     }
 
@@ -102,71 +139,72 @@ export class Kanban implements OnInit {
       event.currentIndex
     );
 
+    await this.taskService.updateTaskStatus(
+      task.id,
+      newStatus
+    );
+
     task.status = newStatus;
 
-    try {
-      await this.taskService.updateTaskStatus(task.id, newStatus);
-    } catch (error) {
-      console.error('Status update failed:', error);
-      this.error = 'Status update failed. Reverting board.';
-      await this.loadTasks();
-    }
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/']);
+    await this.loadTasks();
   }
 
   hasTaskInput() {
-  return this.title.trim().length > 0 || this.description.trim().length > 0;
-}
 
-getAiSuggestion() {
-  const text = (this.title + ' ' + this.description).toLowerCase();
-
-  if (!this.hasTaskInput()) {
-    return '';
+    return (
+      this.title.trim().length > 0 ||
+      this.description.trim().length > 0
+    );
   }
 
-  if (
-    text.includes('security') ||
-    text.includes('jwt') ||
-    text.includes('authentication') ||
-    text.includes('production') ||
-    text.includes('urgent') ||
-    text.includes('critical')
-  ) {
-    return 'HIGH';
+  getAiSuggestion() {
+
+    const text =
+      (this.title + ' ' + this.description).toLowerCase();
+
+    if (
+      text.includes('security') ||
+      text.includes('jwt') ||
+      text.includes('authentication') ||
+      text.includes('production') ||
+      text.includes('critical') ||
+      text.includes('urgent')
+    ) {
+      return 'HIGH';
+    }
+
+    if (
+      text.includes('bug') ||
+      text.includes('fix') ||
+      text.includes('api') ||
+      text.includes('integration')
+    ) {
+      return 'MEDIUM';
+    }
+
+    return 'LOW';
   }
 
-  if (
-    text.includes('bug') ||
-    text.includes('fix') ||
-    text.includes('api') ||
-    text.includes('integration')
-  ) {
-    return 'MEDIUM';
+  getAiReason() {
+
+    const priority = this.getAiSuggestion();
+
+    if (priority === 'HIGH') {
+      return 'Critical security or production workflow detected';
+    }
+
+    if (priority === 'MEDIUM') {
+      return 'Moderate engineering impact predicted';
+    }
+
+    return 'Low urgency task predicted';
   }
 
-  return 'LOW';
-}
+  logout() {
 
-getAiReason() {
-  const priority = this.getAiSuggestion();
+    localStorage.removeItem('token');
+    localStorage.removeItem('userEmail');
 
-  if (!priority) {
-    return '';
+    this.router.navigate(['/']);
   }
-
-  if (priority === 'HIGH') {
-    return 'Critical security, production, or urgent workflow detected';
-  }
-
-  if (priority === 'MEDIUM') {
-    return 'Moderate engineering impact predicted from task context';
-  }
-
-  return 'Low urgency based on current task details';
-}
 }
